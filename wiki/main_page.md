@@ -1,10 +1,8 @@
 ---
 redirect_from: "/"
-layout: page
 title: "网站主页"
 tags: [责任, 版权]
 categories: [指南]
-nav_order: 3
 published: true
 excerpt: "本站基本信息的说明。"
 ---
@@ -14,7 +12,7 @@ This is a Chinese website. If your browser does not support Chinese, or if you d
 佛教净土宗的在家佛弟子。  
 # 关于本站
 这是本人的wiki，用于个人的佛法学习。  
-愿意公开分享个人佛法学习相关信息。但请读者理解，我关注的不一是您关注的，适合我的不一定适合您，我认为对的不一定是您认为对的。
+愿意公开分享佛法学习中的重要信息。但请读者理解，我关注的不一是您关注的，适合我的不一定适合您，我认为对的不一定是您认为对的。
 # 关于责任
 因果自负，不讲条件；法律无情，违者制裁。  
 本站为个人学习而建，内容公开。请读者自行判断内容是否正确、对自己是否适用，并为自己负责。
