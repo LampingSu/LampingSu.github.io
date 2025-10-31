@@ -1,8 +1,16 @@
 ---
 redirect_from: "/"
 ---
-
-This is a sample of main page. You can edit it to start your wiki.
-
-For documentation, installation guide and demo of [git-wiki-theme](git-wiki-theme) visit this [link](http://drassil.github.io/git-wiki/)
-
+This is a Chinese website. If your browser does not support Chinese, or if you do not understand Chinese, this website is not suitable for you.  
+这是一个中文网站。如果您的浏览器不支持中文，或您不懂中文，那这个网站不适合您。
+# 关于本站
+这是一个佛弟子的个人wiki，用于记录个人关注的信息。  
+愿意分享这些信息。但请读者理解，我关注的不一是您关注的，适合我的不一定适合您，我认为对的不一定是您认为对的。
+# 关于责任
+因果自负，不讲条件；法律无情，违者制裁。  
+本站内容是完全公开的，不针对特定个人。请读者自行判断内容是否正确、对自己是否适用，并为自己负责。
+# 关于版权
+本站内容，有个人编写的，有转载其它网站的，有从互联网获取的。  
+个人编写的部分，没有版权限制。愿读者善用，勿断章取义。  
+转载其它网站的部分，已注明来源，读者应尊重原网站的版权条款。  
+从互联网获取的部分，来自相关网站的公开资料，且没有看到限制获取的版权条款。如果哪位认为侵犯了您的权宜，欢迎与我联系。
