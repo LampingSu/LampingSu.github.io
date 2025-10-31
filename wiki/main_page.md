@@ -1,8 +1,8 @@
 ---
 redirect_from: "/"
 title: "网站主页"
-tags: [责任, 版权]
-categories: [指南]
+tags: ["责任", "版权"]
+categories: ["指南"]
 published: true
 excerpt: "本站基本信息的说明。"
 ---
