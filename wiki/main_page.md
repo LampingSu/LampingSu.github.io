@@ -1,10 +1,6 @@
 ---
 redirect_from: "/"
 title: "网站主页"
-tags: ["责任", "版权"]
-categories: ["指南"]
-published: true
-excerpt: "本站基本信息的说明。"
 ---
 This is a Chinese website. If your browser does not support Chinese, or if you do not understand Chinese, this website is not suitable for you.  
 这是一个中文网站。如果您的浏览器不支持中文，或您不懂中文，那这个网站不适合您。
