@@ -1,0 +1,319 @@
+<style>
+  .media-player-container {
+    margin: 20px 0;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+  }
+
+  .player-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .media-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+  }
+
+  .media-table th,
+  .media-table td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+  }
+
+  .media-table th {
+    background-color: #f2f2f2;
+  }
+
+  .download-btn,
+  .play-btn,
+  .nav-btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 2px;
+    background: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+  }
+
+  .play-btn {
+    background: #007bff;
+  }
+
+  .nav-btn {
+    background: #6c757d;
+  }
+
+  .nav-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+
+  .media-element {
+    width: 100%;
+    margin: 10px 0;
+    max-width: 800px;
+  }
+
+  .audio-element {
+    height: 50px;
+  }
+
+  .video-element {
+    height: 400px;
+  }
+
+  .info-text {
+    color: #666;
+    font-size: 14px;
+    margin: 10px 0;
+  }
+
+  .media-type-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #17a2b8;
+    color: white;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-left: 10px;
+  }
+</style>
+
+<div class="media-player-container">
+  <!-- 播放器控制区域 -->
+  <div class="player-controls">
+    <button id="prev-btn" class="nav-btn" onclick="playPrev()" disabled>上一个</button>
+    <div id="media-element-container" style="flex-grow: 1;">
+      <!-- 音频或视频元素将动态插入这里 -->
+    </div>
+    <button id="next-btn" class="nav-btn" onclick="playNext()" disabled>下一个</button>
+  </div>
+  <div id="now-playing-title" style="text-align: center; font-weight: bold; margin: 5px 0;"></div>
+</div>
+
+<!-- 多媒体列表将在这里生成 -->
+<div id="media-list"></div>
+
+<script>
+  // 全局变量
+  let currentEpisodeIndex = -1;
+  let mediaType = ''; // 'audio' 或 'video'
+
+  // 从隐藏的div中获取剧集信息和单集数据
+  const seriesInfo = JSON.parse(document.getElementById('series-info').textContent);
+  const episodesDataElement = document.getElementById('episodes-data');
+  const hasEpisodesData = episodesDataElement && episodesDataElement.textContent.trim() !== '[]';
+
+  // 处理单集数据
+  let episodesData;
+  let actualEndEpisode;
+
+  if (hasEpisodesData) {
+    episodesData = JSON.parse(episodesDataElement.textContent);
+    actualEndEpisode = seriesInfo.startEpisode + episodesData.length - 1;
+  } else {
+    const totalEpisodes = seriesInfo.endEpisode - seriesInfo.startEpisode + 1;
+    episodesData = Array(totalEpisodes).fill("");
+    actualEndEpisode = seriesInfo.endEpisode;
+  }
+
+  // 根据文件扩展名确定媒体类型
+  function determineMediaType(ext) {
+    const audioExtensions = ['mp3', 'wav', 'ogg', 'm4a', 'aac'];
+    const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
+
+    if (audioExtensions.includes(ext.toLowerCase())) {
+      return 'audio';
+    } else if (videoExtensions.includes(ext.toLowerCase())) {
+      return 'video';
+    } else {
+      return 'audio'; // 默认 fallback
+    }
+  }
+
+  // 初始化媒体类型
+  mediaType = determineMediaType(seriesInfo.ext);
+
+  // GitHub 信息
+  const githubUsername = '{{ site.github_username }}';
+  const repoName = '{{ site.github_repository }}';
+  const releaseTag = '{{ page.release_tag }}';
+
+  // 生成下载链接
+  function getDownloadUrl(episodeNum) {
+    const paddedEpisode = episodeNum.toString().padStart(seriesInfo.episodeDigits, '0');
+    const filename = `${seriesInfo.enSeries}_${paddedEpisode}.${seriesInfo.ext}`;
+    return `https://github.com/${githubUsername}/${repoName}/releases/download/${releaseTag}/${filename}`;
+  }
+
+  // 生成原始文件名
+  function getOriginalFilename(episodeNum, zhTitle) {
+    const paddedEpisode = episodeNum.toString().padStart(seriesInfo.episodeDigits, '0');
+    if (zhTitle) {
+      return `${seriesInfo.zhSeries}_${paddedEpisode}_${zhTitle}.${seriesInfo.ext}`;
+    } else {
+      return `${seriesInfo.zhSeries}_${paddedEpisode}.${seriesInfo.ext}`;
+    }
+  }
+
+  // 创建媒体元素
+  function createMediaElement() {
+    const container = document.getElementById('media-element-container');
+    container.innerHTML = ''; // 清空容器
+
+    let mediaElement;
+
+    if (mediaType === 'audio') {
+      mediaElement = document.createElement('audio');
+      mediaElement.className = 'media-element audio-element';
+      mediaElement.controls = true;
+      mediaElement.innerHTML = '您的浏览器不支持 audio 元素。';
+    } else {
+      mediaElement = document.createElement('video');
+      mediaElement.className = 'media-element video-element';
+      mediaElement.controls = true;
+      mediaElement.innerHTML = '您的浏览器不支持 video 元素。';
+    }
+
+    container.appendChild(mediaElement);
+    return mediaElement;
+  }
+
+  // 获取当前媒体元素
+  function getMediaElement() {
+    return document.getElementById('media-element-container').firstChild;
+  }
+
+  // 下载处理函数
+  function handleDownload(episodeNum, zhTitle) {
+    const downloadUrl = getDownloadUrl(episodeNum);
+    const originalFilename = getOriginalFilename(episodeNum, zhTitle);
+
+    // 在新窗口打开下载链接，用户可以使用浏览器"另存为"功能
+    const newWindow = window.open(downloadUrl, '_blank');
+
+    // 显示提示信息
+    setTimeout(() => {
+      if (newWindow && !newWindow.closed) {
+        alert(`请在打开的新窗口中使用"另存为"功能，并将文件名改为:\n${originalFilename}`);
+      }
+    }, 500);
+  }
+
+  // 播放处理函数
+  function handlePlay(episodeNum, zhTitle) {
+    const downloadUrl = getDownloadUrl(episodeNum);
+    const nowPlayingTitle = document.getElementById('now-playing-title');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    currentEpisodeIndex = episodeNum - seriesInfo.startEpisode;
+
+    // 确保媒体元素存在
+    let mediaElement = getMediaElement();
+    if (!mediaElement) {
+      mediaElement = createMediaElement();
+    }
+
+    // 更新播放器信息
+    const displayTitle = zhTitle ? `第${episodeNum.toString().padStart(seriesInfo.episodeDigits, '0')}集：${zhTitle}`
+      : `第${episodeNum.toString().padStart(seriesInfo.episodeDigits, '0')}集`;
+
+    nowPlayingTitle.textContent = `${seriesInfo.zhSeries} - ${displayTitle}`;
+    mediaElement.src = downloadUrl;
+
+    // 更新导航按钮状态
+    prevBtn.disabled = currentEpisodeIndex <= 0;
+    nextBtn.disabled = currentEpisodeIndex >= episodesData.length - 1;
+
+    // 尝试播放
+    mediaElement.play().catch(error => {
+      console.log('自动播放被阻止，用户需要手动点击播放:', error);
+    });
+  }
+
+  // 上一个
+  function playPrev() {
+    if (currentEpisodeIndex > 0) {
+      const prevEpisodeNum = seriesInfo.startEpisode + currentEpisodeIndex - 1;
+      const prevZhTitle = episodesData[currentEpisodeIndex - 1];
+      handlePlay(prevEpisodeNum, prevZhTitle);
+    }
+  }
+
+  // 下一个
+  function playNext() {
+    if (currentEpisodeIndex < episodesData.length - 1) {
+      const nextEpisodeNum = seriesInfo.startEpisode + currentEpisodeIndex + 1;
+      const nextZhTitle = episodesData[currentEpisodeIndex + 1];
+      handlePlay(nextEpisodeNum, nextZhTitle);
+    }
+  }
+
+  // 构建表格HTML
+  function buildMediaTable() {
+    const mediaTypeText = mediaType === 'audio' ? '音频' : '视频';
+    const mediaTypeBadge = `<span class="media-type-badge">${mediaTypeText}</span>`;
+
+    let tableHtml = `
+    <table class="media-table">
+      <thead>
+        <tr>
+          <th>序号</th>
+          <th>本集名</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+    episodesData.forEach((zhTitle, index) => {
+      const episodeNum = seriesInfo.startEpisode + index;
+
+      tableHtml += `
+      <tr>
+        <td>${episodeNum.toString().padStart(seriesInfo.episodeDigits, '0')}</td>
+        <td>${zhTitle || '-'}</td>
+        <td>
+          <button onclick="handleDownload(${episodeNum}, '${zhTitle}')" 
+                  class="download-btn">下载</button>
+          <button onclick="handlePlay(${episodeNum}, '${zhTitle}')" 
+                  class="play-btn">播放</button>
+        </td>
+      </tr>
+    `;
+    });
+
+    tableHtml += `
+      </tbody>
+    </table>
+    
+    <div class="info-text">
+      <strong>剧集信息：</strong>${seriesInfo.zhSeries} ${mediaTypeBadge}
+      <br>共 ${episodesData.length} 集（${seriesInfo.startEpisode} - ${actualEndEpisode}），文件格式为 .${seriesInfo.ext}
+      ${!hasEpisodesData ? '<br><em>注：本剧集各集无单独名称</em>' : ''}
+    </div>
+  `;
+
+    document.getElementById('media-list').innerHTML = tableHtml;
+  }
+
+  // 页面加载完成后初始化
+  document.addEventListener('DOMContentLoaded', function () {
+    // 预先创建媒体元素
+    createMediaElement();
+    // 构建表格
+    buildMediaTable();
+  });
+</script>

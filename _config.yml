@@ -1,3 +1,8 @@
+# 我自己定义的参数。
+github_username: "LampingSu"
+github_repository: "lampingsu.github.io"
+
+# 下面是原有的参数。
 # (string) Title of your wiki
 title: 点滴修行
 # (string) Description of your wiki
