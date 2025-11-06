@@ -200,15 +200,7 @@
     const downloadUrl = getDownloadUrl(episodeNum);
     const originalFilename = getOriginalFilename(episodeNum, zhTitle);
 
-    // 在新窗口打开下载链接，用户可以使用浏览器"另存为"功能
-    const newWindow = window.open(downloadUrl, '_blank');
-
-    // 显示提示信息
-    setTimeout(() => {
-      if (newWindow && !newWindow.closed) {
-        alert(`请在打开的新窗口中使用"另存为"功能，并将文件名改为:\n${originalFilename}`);
-      }
-    }, 500);
+    downloadIndirectly(downloadUrl, originalFilename)
   }
 
   // 播放处理函数
@@ -317,3 +309,5 @@
     buildMediaTable();
   });
 </script>
+
+{% include downloader.html %}
