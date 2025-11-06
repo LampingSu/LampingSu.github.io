@@ -202,7 +202,11 @@
     const downloadUrl = getDownloadUrl(episodeNum);
     const originalFilename = getOriginalFilename(episodeNum, zhTitle);
 
-    downloadIndirectly(downloadUrl, originalFilename)
+    if (window.moduleExports && typeof window.moduleExports.downloadIndirectly === 'function') {
+      window.moduleExports.downloadIndirectly(downloadUrl, originalFilename);
+    } else {
+      console.error('Failed to call downloadIndirectly().')
+    }
   }
 
   // 播放处理函数
