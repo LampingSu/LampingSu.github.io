@@ -105,6 +105,8 @@
 <!-- 多媒体列表将在这里生成 -->
 <div id="media-list"></div>
 
+<script type="module" src="/assets/js/downloader.js"></script>
+
 <script>
   // 全局变量
   let currentEpisodeIndex = -1;
@@ -194,11 +196,6 @@
   function getMediaElement() {
     return document.getElementById('media-element-container').firstChild;
   }
-
-  // 载入downloader.js
-  const scriptDownloader = document.createElement('script');
-  scriptDownloader.src = '/_includes/downloader.js';
-  document.head.appendChild(scriptDownloader);
 
   // 下载处理函数
   function handleDownload(episodeNum, zhTitle) {

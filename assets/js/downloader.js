@@ -6,7 +6,7 @@
 或者，调用下面的JS函数。
 <button onclick="downloadDirectly('文件链接', '自定义文件名')">下载</button>
 */
-function downloadDirectly(url, filename) {
+export function downloadDirectly(url, filename) {
   const link = document.createElement('a');
   link.href = url;
   link.download = filename;
@@ -18,7 +18,7 @@ function downloadDirectly(url, filename) {
 /*如果网站与链接资源服务器不同源，且链接资源服务器支持不CORS跨域资源， 则要调用下面的JS函数。
 <button onclick="downloadIndirect('文件链接', '自定义文件名')">下载</button>
 */
-async function downloadIndirect(url, filename) {
+export async function downloadIndirect(url, filename) {
   try {
     // 创建进度指示器
     const progressBar = document.createElement('progress');
