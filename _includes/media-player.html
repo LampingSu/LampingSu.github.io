@@ -195,6 +195,11 @@
     return document.getElementById('media-element-container').firstChild;
   }
 
+  // 载入downloader.js
+  const scriptDownloader = document.createElement('script');
+  scriptDownloader.src = 'downloader.js';
+  document.head.appendChild(scriptDownloader);
+
   // 下载处理函数
   function handleDownload(episodeNum, zhTitle) {
     const downloadUrl = getDownloadUrl(episodeNum);
@@ -309,5 +314,3 @@
     buildMediaTable();
   });
 </script>
-
-{% include downloader.html %}
