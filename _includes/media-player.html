@@ -105,12 +105,115 @@
 <!-- 多媒体列表将在这里生成 -->
 <div id="media-list"></div>
 
-<script type="module" src="/assets/js/downloader.js"></script>
+<script src="{{ '/assets/js/downloader.js' | relative_url }}"></script>
 
 <script>
   // 全局变量
   let currentEpisodeIndex = -1;
   let mediaType = ''; // 'audio' 或 'video'
+
+  // 播放进度记忆的键名
+  function getStorageKey() {
+    return `mediaProgress_${seriesInfo.enSeries}_${seriesInfo.startEpisode}_${seriesInfo.endEpisode}`;
+  }
+
+  // 保存播放进度
+  function savePlaybackProgress(episodeIndex, currentTime, duration) {
+    if (typeof Storage !== 'undefined') {
+      const progress = {
+        episodeIndex: episodeIndex,
+        currentTime: currentTime,
+        duration: duration,
+        timestamp: new Date().getTime()
+      };
+      localStorage.setItem(getStorageKey(), JSON.stringify(progress));
+    }
+  }
+
+  // 加载播放进度
+  function loadPlaybackProgress() {
+    if (typeof Storage !== 'undefined') {
+      const saved = localStorage.getItem(getStorageKey());
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    }
+    return null;
+  }
+
+  // 初始化播放器
+  function initializePlayer() {
+    const savedProgress = loadPlaybackProgress();
+    const mediaElement = createMediaElement();
+
+    // 设置媒体事件监听
+    mediaElement.addEventListener('timeupdate', function () {
+      if (currentEpisodeIndex >= 0) {
+        savePlaybackProgress(currentEpisodeIndex, this.currentTime, this.duration);
+      }
+    });
+
+    mediaElement.addEventListener('ended', function () {
+      // 自动播放下一集
+      setTimeout(playNext, 2000);
+    });
+
+    // 默认播放第一集或恢复进度
+    if (savedProgress && savedProgress.episodeIndex >= 0) {
+      const savedEpisodeNum = seriesInfo.startEpisode + savedProgress.episodeIndex;
+      const savedZhTitle = episodesData[savedProgress.episodeIndex];
+
+      // 恢复播放
+      restorePlayback(savedEpisodeNum, savedZhTitle, savedProgress);
+    } else {
+      // 默认播放第一集
+      const firstEpisodeNum = seriesInfo.startEpisode;
+      const firstZhTitle = episodesData[0];
+      handlePlay(firstEpisodeNum, firstZhTitle);
+    }
+  }
+
+  // 恢复播放进度
+  function restorePlayback(episodeNum, zhTitle, progress) {
+    const downloadUrl = getDownloadUrl(episodeNum);
+    const nowPlayingTitle = document.getElementById('now-playing-title');
+    const mediaElement = getMediaElement();
+
+    currentEpisodeIndex = episodeNum - seriesInfo.startEpisode;
+
+    // 更新播放器信息
+    const displayTitle = zhTitle ? `第${episodeNum.toString().padStart(seriesInfo.episodeDigits, '0')}集：${zhTitle}`
+      : `第${episodeNum.toString().padStart(seriesInfo.episodeDigits, '0')}集`;
+
+    nowPlayingTitle.textContent = `${seriesInfo.zhSeries} - ${displayTitle}`;
+    mediaElement.src = downloadUrl;
+
+    // 更新导航按钮状态
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    prevBtn.disabled = currentEpisodeIndex <= 0;
+    nextBtn.disabled = currentEpisodeIndex >= episodesData.length - 1;
+
+    // 加载完成后恢复进度
+    mediaElement.addEventListener('loadedmetadata', function () {
+      if (progress.currentTime && progress.duration) {
+        // 如果保存的进度在有效范围内，则恢复
+        if (progress.currentTime < mediaElement.duration - 10) {
+          mediaElement.currentTime = progress.currentTime;
+        }
+      }
+      mediaElement.play().catch(error => {
+        console.log('自动播放被阻止:', error);
+      });
+    }, { once: true });
+  }
+
+  // 修改页面加载完成后的初始化
+  document.addEventListener('DOMContentLoaded', function () {
+    buildMediaTable();
+    initializePlayer(); // 改为使用新的初始化函数
+  });
+
 
   // 从隐藏的div中获取剧集信息和单集数据
   const seriesInfo = JSON.parse(document.getElementById('series-info').textContent);
@@ -202,10 +305,11 @@
     const downloadUrl = getDownloadUrl(episodeNum);
     const originalFilename = getOriginalFilename(episodeNum, zhTitle);
 
-    if (window.moduleExports && typeof window.moduleExports.downloadIndirectly === 'function') {
-      window.moduleExports.downloadIndirectly(downloadUrl, originalFilename);
+    if (typeof handleDownloadWithChineseName !== 'undefined') {
+      handleDownloadWithChineseName(downloadUrl, originalFilename);
     } else {
-      console.error('Failed to call downloadIndirectly().')
+      // 备用方案
+      fallbackDownload(downloadUrl, originalFilename);
     }
   }
 

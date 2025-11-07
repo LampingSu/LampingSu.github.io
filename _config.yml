@@ -1,6 +1,7 @@
 # 我自己定义的参数。
 github_username: "LampingSu"
 github_repository: "lampingsu.github.io"
+baseurl: ""
 
 # 下面是原有的参数。
 # (string) Title of your wiki
