@@ -308,7 +308,6 @@
     }
     // 更新播放器信息
     mediaElement.src = getDownloadUrl(episodeNum);
-
     if (progress) {
       // 加载完成后恢复进度
       mediaElement.addEventListener('loadedmetadata', function () {
@@ -318,9 +317,6 @@
             mediaElement.currentTime = progress.currentTime;
           }
         }
-        mediaElement.play().catch(error => {
-          console.log('自动播放被阻止:', error);
-        });
       }, { once: true });
     } else {
       // 尝试播放
