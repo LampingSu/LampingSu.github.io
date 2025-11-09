@@ -332,10 +332,10 @@
     const originalFilename = getOriginalFilename(episodeNum, zhTitle);
 
     if (typeof handleDownloadWithChineseName !== 'undefined') {
-      handleDownloadWithChineseName(downloadUrl, originalFilename);
+      downloadIndirectly(downloadUrl, originalFilename);
     } else {
       // 备用方案
-      fallbackDownload(downloadUrl, originalFilename);
+      downloadDirectly(downloadUrl, originalFilename);
     }
   }
 

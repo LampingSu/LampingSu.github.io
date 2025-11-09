@@ -7,18 +7,21 @@
 <button onclick="downloadDirectly('文件链接', '自定义文件名')">下载</button>
 */
 function downloadDirectly(url, filename) {
+  console.log(`downloadDirectly(${url}, ${filename}) starts.`);
   const link = document.createElement('a');
   link.href = url;
   link.download = filename;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  console.log(`downloadDirectly(${url}, ${filename}) ended.`);
 }
 
 /*如果网站与链接资源服务器不同源，且链接资源服务器支持不CORS跨域资源， 则要调用下面的JS函数。
-<button onclick="downloadIndirect('文件链接', '自定义文件名')">下载</button>
+<button onclick="downloadIndirectly('文件链接', '自定义文件名')">下载</button>
 */
-async function downloadIndirect(url, filename) {
+async function downloadIndirectly(url, filename) {
+  console.log(`downloadIndirectly(${url}, ${filename}) starts.`);
   try {
     // 创建进度指示器
     const progressBar = document.createElement('progress');
@@ -49,6 +52,7 @@ async function downloadIndirect(url, filename) {
     // 创建Blob并触发下载
     const blob = new Blob(chunks);
     const downloadUrl = URL.createObjectURL(blob);
+    console.log(`blobUrl：${downloadUrl}`);
     downloadDirectly(downloadUrl, filename)
 
     // 清理资源
@@ -65,13 +69,14 @@ async function downloadIndirect(url, filename) {
     });
     // 可添加重试逻辑
   }
+  console.log(`downloadIndirectly(${url}, ${filename}) ended.`)
 }
 
 
 
 // 下载处理函数 - 支持中文文件名
 function handleDownloadWithChineseName(downloadUrl, chineseFilename) {
-  console.log(`handleDownloadWithChineseName(${downloadUrl}, ${chineseFilename}) starts.`)
+  console.log(`handleDownloadWithChineseName(${downloadUrl}, ${chineseFilename}) starts.`);
   // 方法1: 使用 Fetch API 下载并重命名
   fetch(downloadUrl)
     .then(response => {
@@ -83,7 +88,7 @@ function handleDownloadWithChineseName(downloadUrl, chineseFilename) {
     .then(blob => {
       // 创建 blob URL
       const blobUrl = URL.createObjectURL(blob);
-      console.log(`blobUrl：${blobUrl}`)
+      console.log(`blobUrl：${blobUrl}`);
       // 创建隐藏的下载链接
       const link = document.createElement('a');
       link.href = blobUrl;
@@ -103,12 +108,12 @@ function handleDownloadWithChineseName(downloadUrl, chineseFilename) {
       // 降级方案: 新窗口打开并提示用户手动重命名
       fallbackDownload(downloadUrl, chineseFilename);
     });
-  console.log(`handleDownloadWithChineseName(${downloadUrl}, ${chineseFilename}) ended.`)
+  console.log(`handleDownloadWithChineseName(${downloadUrl}, ${chineseFilename}) ended.`);
 }
 
 // 降级下载方案
 function fallbackDownload(downloadUrl, chineseFilename) {
-  console.log(`fallbackDownload(${downloadUrl}, ${chineseFilename}) starts.`)
+  console.log(`fallbackDownload(${downloadUrl}, ${chineseFilename}) starts.`);
   const newWindow = window.open(downloadUrl, '_blank');
 
   // 显示提示信息
@@ -127,12 +132,12 @@ function fallbackDownload(downloadUrl, chineseFilename) {
       }
     }
   }, 1000);
-  console.log(`fallbackDownload(${downloadUrl}, ${chineseFilename}) ended.`)
+  console.log(`fallbackDownload(${downloadUrl}, ${chineseFilename}) ended.`);
 }
 
 // 显示下载帮助
 function showDownloadHelp(filename) {
-  console.log(`showDownloadHelp(${filename}) starts.`)
+  console.log(`showDownloadHelp(${filename}) starts.`);
   const helpHtml = `
         <div style="padding: 20px; font-family: Arial, sans-serif;">
             <h3>下载说明</h3>
@@ -165,10 +170,10 @@ function showDownloadHelp(filename) {
     `;
   helpDiv.innerHTML = helpHtml;
   document.body.appendChild(helpDiv);
-  console.log(`showDownloadHelp(${filename}) ended.`)
+  console.log(`showDownloadHelp(${filename}) ended.`);
 }
 
 // 导出函数供其他文件使用
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { handleDownloadWithChineseName, fallbackDownload, downloadDirectly, downloadIndirect };
+  module.exports = { handleDownloadWithChineseName, fallbackDownload, downloadDirectly, downloadIndirectly };
 }
