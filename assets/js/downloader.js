@@ -61,13 +61,8 @@ async function downloadIndirectly(url, filename) {
       document.body.removeChild(progressBar);
     }, 100);
   } catch (error) {
-    console.error("[ERROR]", error.message, error.stack);
-    showModal({
-      title: "下载失败",
-      content: `${error.userMessage}<br><small>错误代码: ${error.code || "UNKNOWN"}</small>`,
-      buttons: ["关闭"]
-    });
-    // 可添加重试逻辑
+    console.error("[ERROR]", error.message, error.code, "尝试降级下载...");
+    downloadDirectly(url, filename);
   }
   console.log(`downloadIndirectly(${url}, ${filename}) ended.`)
 }
