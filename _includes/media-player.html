@@ -93,11 +93,11 @@
 <div class="media-player-container">
   <!-- 播放器控制区域 -->
   <div class="player-controls">
-    <button id="prev-btn" class="nav-btn" onclick="playPrev()" disabled>上一个</button>
+    <button id="prev-btn" class="nav-btn" onclick="playPrev()" disabled>上一集</button>
     <div id="media-element-container" style="flex-grow: 1;">
       <!-- 音频或视频元素将动态插入这里 -->
     </div>
-    <button id="next-btn" class="nav-btn" onclick="playNext()" disabled>下一个</button>
+    <button id="next-btn" class="nav-btn" onclick="playNext()" disabled>下一集</button>
   </div>
   <div id="now-playing-title" style="text-align: center; font-weight: bold; margin: 5px 0;"></div>
 </div>
@@ -110,7 +110,7 @@
 <script>
   // 全局变量初始化 - 第1部分：剧集信息 和 各集信息
   const seriesInfo = JSON.parse(document.getElementById('series-info').textContent);  // 剧集信息
-  mediaType = determineMediaType(seriesInfo.ext); // 媒体类型：‘audio’ 或 'video'
+  const mediaType = determineMediaType(seriesInfo.ext); // 媒体类型：‘audio’ 或 'video'
   let episodesData;     // 各集信息
   const episodesDataElement = document.getElementById('episodes-data');
   const hasEpisodesData = episodesDataElement && episodesDataElement.textContent.trim() !== '[]'; // 有没有各集信息
@@ -188,10 +188,10 @@
         <td>${episodeNum.toString().padStart(seriesInfo.episodeDigits, '0')}</td>
         <td>${zhTitle || '-'}</td>
         <td>
-          <button onclick="handleDownload(${episodeNum}, '${zhTitle}')" 
-                  class="download-btn">下载</button>
           <button onclick="handlePlay(${index})" 
                   class="play-btn">播放</button>
+          <button onclick="handleDownload(${episodeNum}, '${zhTitle}')" 
+                  class="download-btn">下载</button>
         </td>
       </tr>
     `;
@@ -321,8 +321,21 @@
     } else {
       // 尝试播放
       mediaElement.play().catch(error => {
-        console.log('自动播放被阻止，用户需要手动点击播放:', error);
+        console.log('播放遇到错误：', error);
       });
+    }
+  }
+
+  // 下载处理函数
+  function handleDownload(episodeNum, zhTitle) {
+    const downloadUrl = getDownloadUrl(episodeNum);
+    const originalFilename = getOriginalFilename(episodeNum, zhTitle);
+
+    if (typeof handleDownloadWithChineseName !== 'undefined') {
+      handleDownloadWithChineseName(downloadUrl, originalFilename);
+    } else {
+      // 备用方案
+      fallbackDownload(downloadUrl, originalFilename);
     }
   }
 
@@ -343,19 +356,6 @@
       return `${seriesInfo.zhSeries}_${paddedEpisode}_${zhTitle}.${seriesInfo.ext}`;
     } else {
       return `${seriesInfo.zhSeries}_${paddedEpisode}.${seriesInfo.ext}`;
-    }
-  }
-
-  // 下载处理函数
-  function handleDownload(episodeNum, zhTitle) {
-    const downloadUrl = getDownloadUrl(episodeNum);
-    const originalFilename = getOriginalFilename(episodeNum, zhTitle);
-
-    if (typeof handleDownloadWithChineseName !== 'undefined') {
-      handleDownloadWithChineseName(downloadUrl, originalFilename);
-    } else {
-      // 备用方案
-      fallbackDownload(downloadUrl, originalFilename);
     }
   }
 </script>
