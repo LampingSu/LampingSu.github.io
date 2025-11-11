@@ -23,7 +23,7 @@
   .media-table th,
   .media-table td {
     border: 1px solid #ddd;
-    padding: 8px 12px;
+    padding: 4px 6px;
     text-align: left;
   }
 
@@ -62,11 +62,12 @@
   .media-element {
     width: 100%;
     margin: 10px 0;
-    max-width: 800px;
+    < !-- max-width: 800px;
+    -->
   }
 
   .audio-element {
-    height: 50px;
+    height: 36px;
   }
 
   .video-element {
@@ -89,86 +90,109 @@
     margin-left: 10px;
   }
 </style>
+<!-- 假设 asset_url 为 GitHub release asset 的直链（public asset） -->
+< a id="dl"> 下载：测试文档</a>
 
-<div class="media-player-container">
-  <!-- 播放器控制区域 -->
-  <div class="player-controls">
-    <button id="prev-btn" class="nav-btn" onclick="playPrev()" disabled>上一集</button>
-    <div id="media-element-container" style="flex-grow: 1;">
-      <!-- 音频或视频元素将动态插入这里 -->
+  <div class="media-player-container">
+    <!-- 播放器控制区域 -->
+    <div class="player-controls">
+      <button id="prev-btn" class="nav-btn" onclick="playPrev()" disabled>上一集</button>
+      <div id="media-element-container" style="flex-grow: 1;">
+        <!-- 音频或视频元素将动态插入这里 -->
+      </div>
+      <button id="next-btn" class="nav-btn" onclick="playNext()" disabled>下一集</button>
     </div>
-    <button id="next-btn" class="nav-btn" onclick="playNext()" disabled>下一集</button>
+    <div id="now-playing-title" style="text-align: center; font-weight: bold; margin: 5px 0;"></div>
   </div>
-  <div id="now-playing-title" style="text-align: center; font-weight: bold; margin: 5px 0;"></div>
-</div>
 
-<!-- 多媒体列表将在这里生成 -->
-<div id="media-list"></div>
+  <!-- 多媒体列表将在这里生成 -->
+  <div id="media-list"></div>
 
-<script src="{{ '/assets/js/downloader.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/downloader.js' | relative_url }}"></script>
 
-<script>
-  // 全局变量初始化 - 第1部分：剧集信息 和 各集信息
-  const seriesInfo = JSON.parse(document.getElementById('series-info').textContent);  // 剧集信息
-  const mediaType = determineMediaType(seriesInfo.ext); // 媒体类型：‘audio’ 或 'video'
-  let episodesData;     // 各集信息
-  const episodesDataElement = document.getElementById('episodes-data');
-  const hasEpisodesData = episodesDataElement && episodesDataElement.textContent.trim() !== '[]'; // 有没有各集信息
-  if (hasEpisodesData) {
-    episodesData = JSON.parse(episodesDataElement.textContent);
-    seriesInfo.endEpisode = seriesInfo.startEpisode + episodesData.length - 1;
-  } else {
-    const totalEpisodes = seriesInfo.endEpisode - seriesInfo.startEpisode + 1;
-    episodesData = Array(totalEpisodes).fill("");
-  }
-  let currentEpisodeIndex = -1; // 当前播放的那一集的编号
+  <script>
 
-  // 根据文件扩展名确定媒体类型
-  function determineMediaType(ext) {
-    const audioExtensions = ['mp3', 'wav', 'ogg', 'm4a', 'aac'];
-    const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
 
-    if (audioExtensions.includes(ext.toLowerCase())) {
-      return 'audio';
-    } else if (videoExtensions.includes(ext.toLowerCase())) {
-      return 'video';
+
+    // 示例参数
+    const assetUrl = 'https://github.com/LampingSu/lampingsu.github.io/releases/download/%E3%80%8A%E4%BD%9B%E9%99%80%E4%BC%A0%E3%80%8B%E6%9C%89%E5%A3%B0%E4%B9%A6v0.1/FoTuoZhuan_007.mp3'
+    const chineseName = '佛陀传_007_受伤的天鹅.mp3'
+
+    // 使用你的 worker.dev 域名（或自定义域部署后的路径）
+    const workerBase = 'https://nm.sulpplus.workers.dev/_proxy'
+    const proxied = workerBase + '?url=' + encodeURIComponent(assetUrl) + '&name=' + encodeURIComponent(chineseName)
+
+    const a = document.getElementById('dl')
+    a.href = proxied
+    /* 可选：点击时通过 JS 发起导航（避免浏览器预fetch）
+    a.addEventListener('click', e => {
+      // 直接导航到代理地址，让浏览器处理下载
+      // 如果你希望用 fetch->blob 的方式实现（仅当上游允许 CORS）可改成 fetchAndSave()
+    })*/
+
+
+
+    // 全局变量初始化 - 第1部分：剧集信息 和 各集信息
+    const seriesInfo = JSON.parse(document.getElementById('series-info').textContent);  // 剧集信息
+    const mediaType = determineMediaType(seriesInfo.ext); // 媒体类型：‘audio’ 或 'video'
+    let episodesData;     // 各集信息
+    const episodesDataElement = document.getElementById('episodes-data');
+    const hasEpisodesData = episodesDataElement && episodesDataElement.textContent.trim() !== '[]'; // 有没有各集信息
+    if (hasEpisodesData) {
+      episodesData = JSON.parse(episodesDataElement.textContent);
+      seriesInfo.endEpisode = seriesInfo.startEpisode + episodesData.length - 1;
     } else {
-      return 'audio'; // 默认 fallback
+      const totalEpisodes = seriesInfo.endEpisode - seriesInfo.startEpisode + 1;
+      episodesData = Array(totalEpisodes).fill("");
     }
-  }
+    let currentEpisodeIndex = -1; // 当前播放的那一集的编号
 
+    // 根据文件扩展名确定媒体类型
+    function determineMediaType(ext) {
+      const audioExtensions = ['mp3', 'wav', 'ogg', 'm4a', 'aac'];
+      const videoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'];
 
-  // 页面加载完成后初始化
-  document.addEventListener('DOMContentLoaded', function () {
-    initializePlayer(); // 初始化播放控件
-    buildMediaTable();  // 初始化媒体列表
-  });
-
-  // 初始化播放控件
-  function initializePlayer() {
-    // 创建媒体控件，并设置事件监听
-    const mediaElement = createMediaElement();
-    mediaElement.addEventListener('timeupdate', function () {
-      if (currentEpisodeIndex >= 0) {
-        savePlaybackProgress(currentEpisodeIndex, this.currentTime, this.duration); // 自动保存播放进度
+      if (audioExtensions.includes(ext.toLowerCase())) {
+        return 'audio';
+      } else if (videoExtensions.includes(ext.toLowerCase())) {
+        return 'video';
+      } else {
+        return 'audio'; // 默认 fallback
       }
-    });
-    mediaElement.addEventListener('ended', function () {
-      setTimeout(playNext, 2000); // 自动播放下一集
-    });
-
-    // 默认播放第一集或恢复播放进度
-    const savedProgress = loadPlaybackProgress();
-    if (savedProgress && savedProgress.episodeIndex >= 0) {
-      handlePlay(savedProgress.episodeIndex, savedProgress);  // 恢复播放
-    } else {
-      handlePlay(0);  // 默认播放第一集
     }
-  }
 
-  // 初始化媒体列表
-  function buildMediaTable() {
-    let tableHtml = `
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function () {
+      initializePlayer(); // 初始化播放控件
+      buildMediaTable();  // 初始化媒体列表
+    });
+
+    // 初始化播放控件
+    function initializePlayer() {
+      // 创建媒体控件，并设置事件监听
+      const mediaElement = createMediaElement();
+      mediaElement.addEventListener('timeupdate', function () {
+        if (currentEpisodeIndex >= 0) {
+          savePlaybackProgress(currentEpisodeIndex, this.currentTime, this.duration); // 自动保存播放进度
+        }
+      });
+      mediaElement.addEventListener('ended', function () {
+        setTimeout(playNext, 2000); // 自动播放下一集
+      });
+
+      // 默认播放第一集或恢复播放进度
+      const savedProgress = loadPlaybackProgress();
+      if (savedProgress && savedProgress.episodeIndex >= 0) {
+        handlePlay(savedProgress.episodeIndex, savedProgress);  // 恢复播放
+      } else {
+        handlePlay(0);  // 默认播放第一集
+      }
+    }
+
+    // 初始化媒体列表
+    function buildMediaTable() {
+      let tableHtml = `
     <table class="media-table">
       <thead>
         <tr>
@@ -180,10 +204,10 @@
       <tbody>
   `;
 
-    episodesData.forEach((zhTitle, index) => {
-      const episodeNum = seriesInfo.startEpisode + index;
+      episodesData.forEach((zhTitle, index) => {
+        const episodeNum = seriesInfo.startEpisode + index;
 
-      tableHtml += `
+        tableHtml += `
       <tr>
         <td>${episodeNum.toString().padStart(seriesInfo.episodeDigits, '0')}</td>
         <td>${zhTitle || '-'}</td>
@@ -195,11 +219,11 @@
         </td>
       </tr>
     `;
-    });
+      });
 
-    const mediaTypeText = mediaType === 'audio' ? '音频' : '视频';
-    const mediaTypeBadge = `<span class="media-type-badge">${mediaTypeText}</span>`;
-    tableHtml += `
+      const mediaTypeText = mediaType === 'audio' ? '音频' : '视频';
+      const mediaTypeBadge = `<span class="media-type-badge">${mediaTypeText}</span>`;
+      tableHtml += `
       </tbody>
     </table>
     <div class="info-text">
@@ -209,153 +233,153 @@
     </div>
   `;
 
-    document.getElementById('media-list').innerHTML = tableHtml;
-  }
-
-  // 创建播放控件
-  function createMediaElement() {
-    const container = document.getElementById('media-element-container');
-    container.innerHTML = ''; // 清空容器
-
-    let mediaElement;
-
-    if (mediaType === 'audio') {
-      mediaElement = document.createElement('audio');
-      mediaElement.className = 'media-element audio-element';
-      mediaElement.controls = true;
-      mediaElement.innerHTML = '您的浏览器不支持 audio 元素。';
-    } else {
-      mediaElement = document.createElement('video');
-      mediaElement.className = 'media-element video-element';
-      mediaElement.controls = true;
-      mediaElement.innerHTML = '您的浏览器不支持 video 元素。';
+      document.getElementById('media-list').innerHTML = tableHtml;
     }
 
-    container.appendChild(mediaElement);
-    return mediaElement;
-  }
+    // 创建播放控件
+    function createMediaElement() {
+      const container = document.getElementById('media-element-container');
+      container.innerHTML = ''; // 清空容器
 
-  // 获取当前媒体控件
-  function getMediaElement() {
-    return document.getElementById('media-element-container').firstChild;
-  }
+      let mediaElement;
 
+      if (mediaType === 'audio') {
+        mediaElement = document.createElement('audio');
+        mediaElement.className = 'media-element audio-element';
+        mediaElement.controls = true;
+        mediaElement.innerHTML = '您的浏览器不支持 audio 元素。';
+      } else {
+        mediaElement = document.createElement('video');
+        mediaElement.className = 'media-element video-element';
+        mediaElement.controls = true;
+        mediaElement.innerHTML = '您的浏览器不支持 video 元素。';
+      }
 
-  // 保存播放进度
-  function savePlaybackProgress(episodeIndex, currentTime, duration) {
-    if (typeof Storage !== 'undefined') {
-      const progress = {
-        episodeIndex: episodeIndex,
-        currentTime: currentTime,
-        duration: duration,
-        timestamp: new Date().getTime()
-      };
-      localStorage.setItem(getStorageKey(), JSON.stringify(progress));
+      container.appendChild(mediaElement);
+      return mediaElement;
     }
-  }
 
-  // 加载播放进度
-  function loadPlaybackProgress() {
-    if (typeof Storage !== 'undefined') {
-      const saved = localStorage.getItem(getStorageKey());
-      if (saved) {
-        return JSON.parse(saved);
+    // 获取当前媒体控件
+    function getMediaElement() {
+      return document.getElementById('media-element-container').firstChild;
+    }
+
+
+    // 保存播放进度
+    function savePlaybackProgress(episodeIndex, currentTime, duration) {
+      if (typeof Storage !== 'undefined') {
+        const progress = {
+          episodeIndex: episodeIndex,
+          currentTime: currentTime,
+          duration: duration,
+          timestamp: new Date().getTime()
+        };
+        localStorage.setItem(getStorageKey(), JSON.stringify(progress));
       }
     }
-    return null;
-  }
 
-  // 播放进度记忆的键名
-  function getStorageKey() {
-    return `mediaProgress_${seriesInfo.enSeries}_${seriesInfo.startEpisode}_${seriesInfo.endEpisode}`;
-  }
-
-  // 上一个
-  function playPrev() {
-    if (currentEpisodeIndex > 0) {
-      handlePlay(currentEpisodeIndex - 1);
-    }
-  }
-
-  // 下一个
-  function playNext() {
-    if (currentEpisodeIndex < episodesData.length - 1) {
-      handlePlay(currentEpisodeIndex + 1);
-    }
-  }
-
-  // 播放处理函数
-  function handlePlay(episodeIndex, progress = null) {
-    const episodeNum = seriesInfo.startEpisode + episodeIndex;
-    currentEpisodeIndex = episodeIndex;
-
-    // 更新导航按钮状态
-    const prevBtn = document.getElementById('prev-btn');
-    prevBtn.disabled = currentEpisodeIndex <= 0;
-    const nextBtn = document.getElementById('next-btn');
-    nextBtn.disabled = currentEpisodeIndex >= episodesData.length - 1;
-
-    // 更新播放信息
-    const nowPlayingTitle = document.getElementById('now-playing-title');
-    displayTitle = `第${episodeNum.toString().padStart(seriesInfo.episodeDigits, '0')}集`;
-    displayTitle += hasEpisodesData ? `：${episodesData[episodeIndex]}` : '';
-    nowPlayingTitle.textContent = `${seriesInfo.zhSeries} - ${displayTitle}`;
-
-    // 确保媒体元素存在
-    let mediaElement = getMediaElement();
-    if (!mediaElement) {
-      mediaElement = createMediaElement();
-    }
-    // 更新播放器信息
-    mediaElement.src = getDownloadUrl(episodeNum);
-    if (progress) {
-      // 加载完成后恢复进度
-      mediaElement.addEventListener('loadedmetadata', function () {
-        if (progress.currentTime && progress.duration) {
-          // 如果保存的进度在有效范围内，则恢复
-          if (progress.currentTime < mediaElement.duration - 10) {
-            mediaElement.currentTime = progress.currentTime;
-          }
+    // 加载播放进度
+    function loadPlaybackProgress() {
+      if (typeof Storage !== 'undefined') {
+        const saved = localStorage.getItem(getStorageKey());
+        if (saved) {
+          return JSON.parse(saved);
         }
-      }, { once: true });
-    } else {
-      // 尝试播放
-      mediaElement.play().catch(error => {
-        console.log('播放遇到错误：', error);
-      });
+      }
+      return null;
     }
-  }
 
-  // 下载处理函数
-  function handleDownload(episodeNum, zhTitle) {
-    const downloadUrl = getDownloadUrl(episodeNum);
-    const originalFilename = getOriginalFilename(episodeNum, zhTitle);
-
-    if (typeof downloadIndirectly !== 'undefined') {
-      downloadIndirectly(downloadUrl, originalFilename);
-    } else {
-      // 备用方案
-      downloadDirectly(downloadUrl, originalFilename);
+    // 播放进度记忆的键名
+    function getStorageKey() {
+      return `mediaProgress_${seriesInfo.enSeries}_${seriesInfo.startEpisode}_${seriesInfo.endEpisode}`;
     }
-  }
 
-  // 生成下载链接
-  function getDownloadUrl(episodeNum) {
-    const paddedEpisode = episodeNum.toString().padStart(seriesInfo.episodeDigits, '0');
-    const filename = `${seriesInfo.enSeries}_${paddedEpisode}.${seriesInfo.ext}`;
-    const githubUsername = '{{ site.github_username }}';
-    const repoName = '{{ site.github_repository }}';
-    const releaseTag = '{{ page.release_tag }}';
-    return `https://github.com/${githubUsername}/${repoName}/releases/download/${releaseTag}/${filename}`;
-  }
-
-  // 生成原始文件名
-  function getOriginalFilename(episodeNum, zhTitle) {
-    const paddedEpisode = episodeNum.toString().padStart(seriesInfo.episodeDigits, '0');
-    if (zhTitle) {
-      return `${seriesInfo.zhSeries}_${paddedEpisode}_${zhTitle}.${seriesInfo.ext}`;
-    } else {
-      return `${seriesInfo.zhSeries}_${paddedEpisode}.${seriesInfo.ext}`;
+    // 上一个
+    function playPrev() {
+      if (currentEpisodeIndex > 0) {
+        handlePlay(currentEpisodeIndex - 1);
+      }
     }
-  }
-</script>
+
+    // 下一个
+    function playNext() {
+      if (currentEpisodeIndex < episodesData.length - 1) {
+        handlePlay(currentEpisodeIndex + 1);
+      }
+    }
+
+    // 播放处理函数
+    function handlePlay(episodeIndex, progress = null) {
+      const episodeNum = seriesInfo.startEpisode + episodeIndex;
+      currentEpisodeIndex = episodeIndex;
+
+      // 更新导航按钮状态
+      const prevBtn = document.getElementById('prev-btn');
+      prevBtn.disabled = currentEpisodeIndex <= 0;
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.disabled = currentEpisodeIndex >= episodesData.length - 1;
+
+      // 更新播放信息
+      const nowPlayingTitle = document.getElementById('now-playing-title');
+      displayTitle = `第${episodeNum.toString().padStart(seriesInfo.episodeDigits, '0')}集`;
+      displayTitle += hasEpisodesData ? `：${episodesData[episodeIndex]}` : '';
+      nowPlayingTitle.textContent = `${seriesInfo.zhSeries} - ${displayTitle}`;
+
+      // 确保媒体元素存在
+      let mediaElement = getMediaElement();
+      if (!mediaElement) {
+        mediaElement = createMediaElement();
+      }
+      // 更新播放器信息
+      mediaElement.src = getDownloadUrl(episodeNum);
+      if (progress) {
+        // 加载完成后恢复进度
+        mediaElement.addEventListener('loadedmetadata', function () {
+          if (progress.currentTime && progress.duration) {
+            // 如果保存的进度在有效范围内，则恢复
+            if (progress.currentTime < mediaElement.duration - 10) {
+              mediaElement.currentTime = progress.currentTime;
+            }
+          }
+        }, { once: true });
+      } else {
+        // 尝试播放
+        mediaElement.play().catch(error => {
+          console.log('播放遇到错误：', error);
+        });
+      }
+    }
+
+    // 下载处理函数
+    function handleDownload(episodeNum, zhTitle) {
+      const downloadUrl = getDownloadUrl(episodeNum);
+      const originalFilename = getOriginalFilename(episodeNum, zhTitle);
+
+      if (typeof downloadIndirectly !== 'undefined') {
+        downloadIndirectly(downloadUrl, originalFilename);
+      } else {
+        // 备用方案
+        downloadDirectly(downloadUrl, originalFilename);
+      }
+    }
+
+    // 生成下载链接
+    function getDownloadUrl(episodeNum) {
+      const paddedEpisode = episodeNum.toString().padStart(seriesInfo.episodeDigits, '0');
+      const filename = `${seriesInfo.enSeries}_${paddedEpisode}.${seriesInfo.ext}`;
+      const githubUsername = '{{ site.github_username }}';
+      const repoName = '{{ site.github_repository }}';
+      const releaseTag = '{{ page.release_tag }}';
+      return `https://github.com/${githubUsername}/${repoName}/releases/download/${releaseTag}/${filename}`;
+    }
+
+    // 生成原始文件名
+    function getOriginalFilename(episodeNum, zhTitle) {
+      const paddedEpisode = episodeNum.toString().padStart(seriesInfo.episodeDigits, '0');
+      if (zhTitle) {
+        return `${seriesInfo.zhSeries}_${paddedEpisode}_${zhTitle}.${seriesInfo.ext}`;
+      } else {
+        return `${seriesInfo.zhSeries}_${paddedEpisode}.${seriesInfo.ext}`;
+      }
+    }
+  </script>
