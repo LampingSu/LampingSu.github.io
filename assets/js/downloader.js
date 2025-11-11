@@ -61,7 +61,7 @@ async function downloadIndirectly(url, filename) {
       document.body.removeChild(progressBar);
     }, 100);
   } catch (error) {
-    console.error("[ERROR]", error.message, error.code, "尝试降级下载...");
+    console.error("[ERROR]", error.message, "尝试降级下载...");
     downloadDirectly(url, filename);
   }
   console.log(`downloadIndirectly(${url}, ${filename}) ended.`)

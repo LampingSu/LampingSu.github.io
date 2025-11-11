@@ -1,0 +1,62 @@
+/* 基础字体放大：把 15px -> 17px（根据需要改成 16/18 等）*/
+html,
+body {
+  font-size: 20px;
+  /* 覆盖主题里的 15px */
+  line-height: 1.6;
+}
+
+/* 如果主题主要内容都在 body > .wrapper，确保 wrapper 基准一致 */
+body>.wrapper {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* 标题按 rem 重新标定，整体放大大约 1.2 倍，可以按需微调 */
+body>.wrapper h1 {
+  font-size: 2.4rem;
+}
+
+/* 原来 ~2em(基于15px) */
+body>.wrapper h2 {
+  font-size: 2.0rem;
+}
+
+body>.wrapper h3 {
+  font-size: 1.8rem;
+}
+
+body>.wrapper h4 {
+  font-size: 1.6rem;
+}
+
+body>.wrapper h5 {
+  font-size: 1.4rem;
+}
+
+body>.wrapper h6 {
+  font-size: 1.2rem;
+  color: #6a737d;
+}
+
+/* 增大内联 code 与代码块字号（主题默认 85%，这里改成更可读的 95% 或 100%）*/
+body>.wrapper code {
+  font-size: 95%;
+}
+
+body>.wrapper pre,
+body>.wrapper .highlight pre {
+  font-size: 95%;
+  line-height: 1.5;
+}
+
+/* 可选：增加段落间距，便于大字号阅读 */
+body>.wrapper p {
+  margin-bottom: 1em;
+}
+
+/* 小字号元素单独调整（例如 footer 或 sidebar 的 small）*/
+.git-wiki-page small,
+#git-wiki-sidebar small {
+  font-size: 0.9rem;
+}
