@@ -194,13 +194,13 @@
         <td>
           <button onclick="handlePlay(${index})" 
                   class="play-btn">播放</button>
-          <button onclick="downloadDirectly(${downloadUrl}, ${originalFilename})" 
+          <button onclick="handleDownloadDirectly(${downloadUrl}, ${originalFilename})" 
                   class="download-btn">直接下载</button>
-          <button onclick="downloadViaWorker(${downloadUrl}, ${originalFilename})" 
+          <button onclick="handleDownloadViaWorker(${downloadUrl}, ${originalFilename})" 
                   class="download-btn">代理下载</button>
-          <button onclick="downloadDirectly(${testUrl}, ${originalFilename})" 
+          <button onclick="handDownloadDirectly(${testUrl}, ${originalFilename})" 
                   class="download-btn">测试下载1</button>
-          <button onclick="downloadViaWorker(${testUrl}, ${originalFilename})" 
+          <button onclick="handleDownloadViaWorker(${testUrl}, ${originalFilename})" 
                   class="download-btn">测试下载2</button>
         </td>
       </tr>
@@ -334,6 +334,16 @@
         console.log('播放遇到错误：', error);
       });
     }
+  }
+
+  // 下载处理函数
+  function handleDownloadDirectly(url, fileName) {
+    downloadDirectly(url, fileName);
+  }
+
+  // 下载处理函数
+  function handleDownloadViaWorker(url, fileName) {
+    downloadViaWorker(url, fileName);
   }
 
   // 下载处理函数
