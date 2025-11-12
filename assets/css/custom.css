@@ -14,39 +14,39 @@ body>.wrapper {
 
 /* 标题按 rem 重新标定，整体放大大约 1.2 倍，可以按需微调 */
 body>.wrapper h1 {
-  font-size: 2.4rem;
+  font-size: 2.0rem;
 }
 
 /* 原来 ~2em(基于15px) */
 body>.wrapper h2 {
-  font-size: 2.0rem;
-}
-
-body>.wrapper h3 {
   font-size: 1.8rem;
 }
 
-body>.wrapper h4 {
+body>.wrapper h3 {
   font-size: 1.6rem;
 }
 
-body>.wrapper h5 {
+body>.wrapper h4 {
   font-size: 1.4rem;
 }
 
-body>.wrapper h6 {
+body>.wrapper h5 {
   font-size: 1.2rem;
+}
+
+body>.wrapper h6 {
+  font-size: 1.0rem;
   color: #6a737d;
 }
 
 /* 增大内联 code 与代码块字号（主题默认 85%，这里改成更可读的 95% 或 100%）*/
 body>.wrapper code {
-  font-size: 95%;
+  font-size: 90%;
 }
 
 body>.wrapper pre,
 body>.wrapper .highlight pre {
-  font-size: 95%;
+  font-size: 90%;
   line-height: 1.5;
 }
 
@@ -58,5 +58,5 @@ body>.wrapper p {
 /* 小字号元素单独调整（例如 footer 或 sidebar 的 small）*/
 .git-wiki-page small,
 #git-wiki-sidebar small {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }

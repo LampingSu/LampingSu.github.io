@@ -90,8 +90,6 @@
     margin-left: 10px;
   }
 </style>
-<!-- 假设 asset_url 为 GitHub release asset 的直链（public asset） -->
-<a id="dl"> 下载：测试文档</a>
 
 <div class="media-player-container">
   <!-- 播放器控制区域 -->
@@ -111,27 +109,6 @@
 <script src="{{ '/assets/js/downloader.js' | relative_url }}"></script>
 
 <script>
-
-
-
-  // 示例参数
-  const assetUrl = 'https://github.com/LampingSu/lampingsu.github.io/releases/download/%E3%80%8A%E4%BD%9B%E9%99%80%E4%BC%A0%E3%80%8B%E6%9C%89%E5%A3%B0%E4%B9%A6v0.1/FoTuoZhuan_007.mp3'
-  const chineseName = '佛陀传_007_受伤的天鹅.mp3'
-
-  // 使用你的 worker.dev 域名（或自定义域部署后的路径）
-  const workerBase = 'https://nm.sulpplus.workers.dev/_proxy'
-  const proxied = workerBase + '?url=' + encodeURIComponent(assetUrl) + '&name=' + encodeURIComponent(chineseName)
-
-  const a = document.getElementById('dl')
-  a.href = proxied
-  /* 可选：点击时通过 JS 发起导航（避免浏览器预fetch）
-  a.addEventListener('click', e => {
-    // 直接导航到代理地址，让浏览器处理下载
-    // 如果你希望用 fetch->blob 的方式实现（仅当上游允许 CORS）可改成 fetchAndSave()
-  })*/
-
-
-
   // 全局变量初始化 - 第1部分：剧集信息 和 各集信息
   const seriesInfo = JSON.parse(document.getElementById('series-info').textContent);  // 剧集信息
   const mediaType = determineMediaType(seriesInfo.ext); // 媒体类型：‘audio’ 或 'video'
@@ -206,6 +183,9 @@
 
     episodesData.forEach((zhTitle, index) => {
       const episodeNum = seriesInfo.startEpisode + index;
+      const downloadUrl = getDownloadUrl(episodeNum);
+      const originalFilename = getOriginalFilename(episodeNum, zhTitle);
+      const testUrl = '';
 
       tableHtml += `
       <tr>
@@ -214,8 +194,14 @@
         <td>
           <button onclick="handlePlay(${index})" 
                   class="play-btn">播放</button>
-          <button onclick="handleDownload(${episodeNum}, '${zhTitle}')" 
-                  class="download-btn">下载</button>
+          <button onclick="downloadDirectly(${downloadUrl}, '${originalFilename}')" 
+                  class="download-btn">直接下载</button>
+          <button onclick="downloadViaWorker(${downloadUrl}, '${originalFilename}')" 
+                  class="download-btn">代理下载</button>
+          <button onclick="downloadDirectly(${testUrl}, '${originalFilename}')" 
+                  class="download-btn">测试下载1</button>
+          <button onclick="downloadViaWorker(${testUrl}, '${originalFilename}')" 
+                  class="download-btn">测试下载2</button>
         </td>
       </tr>
     `;
