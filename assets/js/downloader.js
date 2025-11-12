@@ -30,7 +30,7 @@ function downloadDirectly(url, fileName) {
  * - 无法在 JS 中获知下载是否成功（浏览器负责保存）
  */
 function downloadViaWorker(url, fileName) {
-  const proxied = proxiedUrl(url, fileName, workerBase)
+  const proxied = proxiedUrl(url, fileName)
 
   const a = document.createElement('a')
   a.href = proxied
@@ -50,7 +50,7 @@ function downloadViaWorker(url, fileName) {
  * - 返回 Promise，resolve 表示已触发下载，reject 表示检查失败或异常
  */
 function downloadViaWorkerWithCheck(url, fileName, opts = {}) {
-  const proxied = proxiedUrl(url, fileName, workerBase)
+  const proxied = proxiedUrl(url, fileName)
   const timeoutMs = opts.timeoutMs || 10000
   const method = opts.method || 'HEAD' // 若上游不支持 HEAD 可改为 'GET'
 
@@ -67,7 +67,7 @@ function downloadViaWorkerWithCheck(url, fileName, opts = {}) {
         throw new Error('资源不可用，http status: ' + resp.status)
       }
       // 检查通过，触发下载
-      downloadViaWorker(url, fileName, workerBase)
+      downloadViaWorker(url, fileName)
       return true
     })
     .catch(err => {
@@ -77,8 +77,8 @@ function downloadViaWorkerWithCheck(url, fileName, opts = {}) {
     })
 }
 
-function proxiedUrl(assetUrl, fileName, workerBase = DEFAULT_WORKER_BASE) {
-  const DEFAULT_WORKER_BASE = 'https://nm.sulpplus.workers.dev/_proxy'
+function proxiedUrl(assetUrl, fileName) {
+  const workerBase = 'https://nm.sulpplus.workers.dev/_proxy'
   return workerBase + '?url=' + encodeURIComponent(assetUrl) + '&name=' + encodeURIComponent(fileName)
 }
 
