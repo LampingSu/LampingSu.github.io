@@ -30,6 +30,7 @@ function downloadDirectly(url, fileName) {
  * - 无法在 JS 中获知下载是否成功（浏览器负责保存）
  */
 function downloadViaWorker(url, fileName) {
+  console.log(`downloadViaWorker(${url}, ${fileName}) starts.`);
   const proxied = proxiedUrl(url, fileName)
 
   const a = document.createElement('a')
@@ -42,6 +43,7 @@ function downloadViaWorker(url, fileName) {
   document.body.appendChild(a)
   a.click()
   document.body.removeChild(a)
+  console.log(`downloadViaWorker(${url}, ${fileName}) ended.`);
 }
 
 /**

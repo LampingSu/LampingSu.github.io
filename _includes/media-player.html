@@ -341,8 +341,8 @@
     const downloadUrl = getDownloadUrl(episodeNum);
     const originalFilename = getOriginalFilename(episodeNum, zhTitle);
 
-    if (typeof downloadIndirectly !== 'undefined') {
-      downloadIndirectly(downloadUrl, originalFilename);
+    if (typeof downloadViaWorker !== 'undefined') {
+      downloadViaWorker(downloadUrl, originalFilename);
     } else {
       // 备用方案
       downloadDirectly(downloadUrl, originalFilename);
