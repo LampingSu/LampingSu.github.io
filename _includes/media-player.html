@@ -194,13 +194,13 @@
         <td>
           <button onclick="handlePlay(${index})" 
                   class="play-btn">播放</button>
-          <button onclick="handleDownloadDirectly(${downloadUrl}, ${originalFilename})" 
+          <button onclick="handleDownloadDirectly(‘${downloadUrl}’, ‘${originalFilename}‘)" 
                   class="download-btn">直接下载</button>
-          <button onclick="handleDownloadViaWorker(${downloadUrl}, ${originalFilename})" 
+          <button onclick="handleDownloadViaWorker(’${downloadUrl}‘, ’${originalFilename}‘)" 
                   class="download-btn">代理下载</button>
-          <button onclick="handDownloadDirectly(${testUrl}, ${originalFilename})" 
+          <button onclick="handDownloadDirectly(’${testUrl}‘, ’${originalFilename}‘)" 
                   class="download-btn">测试下载1</button>
-          <button onclick="handleDownloadViaWorker(${testUrl}, ${originalFilename})" 
+          <button onclick="handleDownloadViaWorker(’${testUrl}‘, ’${originalFilename}‘)" 
                   class="download-btn">测试下载2</button>
         </td>
       </tr>
