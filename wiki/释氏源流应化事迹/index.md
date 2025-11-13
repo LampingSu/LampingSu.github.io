@@ -1,26 +1,30 @@
 ---
-layout: default
-title: "文集目录"
+layout: 释氏源流应化事迹  
+title: "目录"
 ---
 
-# {{ site.data.articles.config.title }}
-
-{% assign articles = site.data.articles.articles %}
+# 文集名称
 
 <table>
 <tr>
-{% for article in articles %}
-    <td style="padding: 10px; vertical-align: top;">
-        <a href="articles/{{ article.id }}">
-            {{ article.id }}<br>{{ article.title }}
-        </a>
-    </td>
+{% for i in (0..190) %}
+    {% assign article_id = i | prepend: '00' | slice: -3, 3 %}
+    {% assign article_path = "wiki/文集名称/" | append: article_id | append: ".md" %}
     
-    <!-- 每4个换行 -->
-    {% assign index = forloop.index0 | plus: 1 %}
-    {% if index % 4 == 0 %}
-        </tr><tr>
-    {% endif %}
+    {% for doc in site.documents %}
+        {% if doc.path == article_path %}
+            <td style="padding: 10px; vertical-align: top; width: 25%;">
+                <a href="{{ article_id }}">
+                    {{ doc.id }}<br>{{ doc.title }}
+                </a>
+            </td>
+            
+            {% assign index = forloop.index0 | plus: 1 %}
+            {% if index % 4 == 0 %}
+                </tr><tr>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
 {% endfor %}
 </tr>
 </table>
