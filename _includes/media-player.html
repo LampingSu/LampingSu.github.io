@@ -185,23 +185,15 @@
       const episodeNum = seriesInfo.startEpisode + index;
       const downloadUrl = getDownloadUrl(episodeNum);
       const originalFilename = getOriginalFilename(episodeNum, zhTitle);
-      const testUrl = 'https://www.lsdls.cnn/#/pc/website/content/article?col=5122&page=5173&categoryId=5173&id=27748xxx&haveCate=true';
 
       tableHtml += `
       <tr>
         <td>${episodeNum.toString().padStart(seriesInfo.episodeDigits, '0')}</td>
         <td>${zhTitle || '-'}</td>
         <td>
-          <button onclick="handlePlay(${index})" 
-                  class="play-btn">播放</button>
-          <button onclick="downloadDirectly('${downloadUrl}', '${originalFilename}')" 
-                  class="download-btn">直接下载</button>
-          <button onclick="downloadViaWorker('${downloadUrl}', '${originalFilename}')" 
-                  class="download-btn">代理下载</button>
-          <button onclick="downloadDirectly('${testUrl}', '${originalFilename}')" 
-                  class="download-btn">测试下载1</button>
-          <button onclick="downloadViaWorker('${testUrl}', '${originalFilename}')" 
-                  class="download-btn">测试下载2</button>
+          <button onclick="handlePlay(${index})" class="play-btn">播放</button>
+          <button onclick="downloadDirectly('${downloadUrl}', '${originalFilename}')" class="download-btn">英文名下载</button>
+          <button onclick="downloadViaWorker('${downloadUrl}', '${originalFilename}')" class="download-btn">中文名下载</button>
         </td>
       </tr>
     `;
@@ -333,29 +325,6 @@
       mediaElement.play().catch(error => {
         console.log('播放遇到错误：', error);
       });
-    }
-  }
-
-  // 下载处理函数
-  function handleDownloadDirectly(url, fileName) {
-    downloadDirectly(url, fileName);
-  }
-
-  // 下载处理函数
-  function handleDownloadViaWorker(url, fileName) {
-    downloadViaWorker(url, fileName);
-  }
-
-  // 下载处理函数
-  function handleDownload(episodeNum, zhTitle) {
-    const downloadUrl = getDownloadUrl(episodeNum);
-    const originalFilename = getOriginalFilename(episodeNum, zhTitle);
-
-    if (typeof downloadViaWorker !== 'undefined') {
-      downloadViaWorker(downloadUrl, originalFilename);
-    } else {
-      // 备用方案
-      downloadDirectly(downloadUrl, originalFilename);
     }
   }
 

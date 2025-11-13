@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>{{ page.title }} - {{ site.data.articles.config.title }}</title>
+</head>
+
+<body>
+  <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <!-- 自动导航 -->
+    <nav style="margin-bottom: 2rem; padding: 1rem; background: #f5f5f5;">
+      {% assign articles = site.data.articles.articles %}
+      {% assign current_index = page.id | split: "/" | last | plus: 0 %}
+
+      <a href="{{ '/' | relative_url }}">首页</a> |
+      <a href="../">目录</a> |
+
+      <!-- 上一篇 -->
+      {% if current_index > 0 %}
+      {% assign prev = articles[current_index | minus: 1] %}
+      <a href="../articles/{{ prev.id }}">上一篇: {{ prev.title }}</a> |
+      {% else %}
+      <span>上一篇</span> |
+      {% endif %}
+
+      <!-- 下一篇 -->
+      {% if current_index < articles.size | minus: 1 %} {% assign next=articles[current_index | plus: 1] %} <a
+        href="../articles/{{ next.id }}">下一篇: {{ next.next.title }}</a> |
+        {% else %}
+        <span>下一篇</span> |
+        {% endif %}
+
+        <!-- 外部链接 -->
+        {% assign current_article = articles[current_index] %}
+        <a href="{{ site.data.articles.config.external_site }}{{ current_article.external }}">外部原文</a>
+    </nav>
+
+    <!-- 内容 -->
+    <article>
+      <h1>{{ page.title }}</h1>
+      {{ content }}
+    </article>
+  </div>
+</body>
+
+</html>
