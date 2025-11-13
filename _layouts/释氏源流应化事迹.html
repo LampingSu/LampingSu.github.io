@@ -25,19 +25,19 @@
       {% assign current_id = page.id | plus: 0 %}
 
       <a href="/">首页</a> |
-      <a href="/wiki/文集名称/">目录</a> |
+      <a href="/wiki/释氏源流应化事迹/">目录</a> |
 
       <!-- 自动计算上一篇 -->
       {% if current_id > 0 %}
       {% assign prev_id = current_id | minus: 1 | prepend: '00' | slice: -3, 3 %}
-      <a href="/wiki/文集名称/{{ prev_id }}">上一篇</a> |
+      <a href="/wiki/释氏源流应化事迹/{{ prev_id }}">上一篇</a> |
       {% else %}
       <span>上一篇</span> |
       {% endif %}
 
       <!-- 自动计算下一篇 -->
       {% if current_id < 190 %} {% assign next_id=current_id | plus: 1 | prepend: '00' | slice: -3, 3 %} <a
-        href="/wiki/文集名称/{{ next_id }}">下一篇</a> |
+        href="/wiki/释氏源流应化事迹/{{ next_id }}">下一篇</a> |
         {% else %}
         <span>下一篇</span> |
         {% endif %}
